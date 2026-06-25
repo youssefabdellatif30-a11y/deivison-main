@@ -363,12 +363,9 @@ export default function ProductPage({ productId, onBack, isB2B, onOpenModal }: P
           <div className="pp-cta-group">
             <button
               className="pp-cta-main"
-              onClick={() => {
-                setQuoteMode('quote');
-                setQuoteOpen(true);
-              }}
+              onClick={onOpenModal}
             >
-              REQUEST A QUOTE
+              CREATE ACCOUNT
             </button>
             <button
               className="pp-cta-wish"
@@ -383,7 +380,7 @@ export default function ProductPage({ productId, onBack, isB2B, onOpenModal }: P
               className="pp-cta-wish"
               onClick={handleMainCta}
             >
-              {isB2B ? 'ADD TO ORDER' : 'WHOLESALE ACCESS'}
+              {isB2B ? 'ADD TO ORDER' : 'ACCOUNT APPROVAL'}
             </button>
             <button className="pp-cta-wish" onClick={handleWishlist}>
               <Heart size={14} /> ADD TO WISHLIST

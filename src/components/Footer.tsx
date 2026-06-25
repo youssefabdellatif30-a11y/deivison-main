@@ -194,8 +194,8 @@ export default function Footer({ onNavigate, onOpenModal, onOpenQuote }: FooterP
       </div>
 
       <div className="footer-quote-cta">
-        <span>Need pricing, samples, or private-label information?</span>
-        <button className="btn-primary" onClick={onOpenQuote}>Request a Quote</button>
+        <span>Create a buyer account to request access to wholesale information.</span>
+        <button className="btn-primary" onClick={onOpenQuote}>Create Account</button>
       </div>
 
       <div className="footer-bottom">

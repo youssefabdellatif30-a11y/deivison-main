@@ -34,7 +34,7 @@ const faqs = [
   },
   {
     question: "Can I request samples?",
-    answer: "Products marked as sample available can be requested from the product page. The request is sent through the quote form as a sample enquiry.",
+    answer: "Products marked as sample available can be requested from the product page. Buyer account access is reviewed separately before protected wholesale features are available.",
   },
   {
     question: "Do you offer private-label manufacturing?",
@@ -50,7 +50,7 @@ const faqs = [
   },
   {
     question: "Can packaging be customized?",
-    answer: "Packaging requirements can be included in the quote request. Confirm available packaging options before publishing final claims.",
+    answer: "Packaging requirements can be discussed after your buyer account request is reviewed. Confirm available packaging options before publishing final claims.",
   },
   {
     question: "Do you ship internationally?",
@@ -58,7 +58,7 @@ const faqs = [
   },
   {
     question: "How does the quotation process work?",
-    answer: "Choose a product, select the colour and size, submit the quote form, and the request appears in the admin dashboard for follow-up.",
+    answer: "Create an account for approval first. After approval, DiVision can follow up on product, colour, size, and wholesale requirements.",
   },
 ];
 
@@ -79,11 +79,11 @@ function QuoteBand({ onOpenQuote }: { onOpenQuote: () => void }) {
   return (
     <section className="quote-band">
       <div>
-        <span className="section-eyebrow">Wholesale enquiry</span>
-        <h2 className="section-title">Ready to discuss your order?</h2>
+        <span className="section-eyebrow">Wholesale access</span>
+        <h2 className="section-title">Create an approved buyer account</h2>
       </div>
       <button className="btn-primary" onClick={onOpenQuote}>
-        Request a Quote <ArrowRight size={15} />
+        Create Account <ArrowRight size={15} />
       </button>
     </section>
   );
@@ -123,7 +123,7 @@ export function PrivateLabelPage({ onOpenQuote }: PageProps) {
       <PageHero
         eyebrow="Private Label"
         title="Brand-ready eyewear options"
-        body="Private-label availability is tracked per product in the catalogue. Use the quote form to confirm what is possible for a specific model and order."
+        body="Private-label availability is tracked per product in the catalogue. Create an account for approval before discussing protected wholesale and branding details."
       />
       <section className="info-section split-info">
         <div>
@@ -177,9 +177,9 @@ export function ContactPage({ onOpenQuote }: PageProps) {
           <p className="content-note">Business hours have not been supplied yet.</p>
         </div>
         <div className="contact-panel">
-          <h2 className="section-title">Start an enquiry</h2>
-          <p className="section-body">Use the quote form for wholesale pricing, samples, packaging requirements, and private-label requests.</p>
-          <button className="btn-primary" onClick={onOpenQuote}>Request a Quote</button>
+          <h2 className="section-title">Create buyer access</h2>
+          <p className="section-body">Create an account for approval before accessing protected wholesale information.</p>
+          <button className="btn-primary" onClick={onOpenQuote}>Create Account</button>
         </div>
       </section>
     </>

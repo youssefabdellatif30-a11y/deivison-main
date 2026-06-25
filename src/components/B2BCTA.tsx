@@ -74,7 +74,7 @@ export default function B2BCTA({ onOpenModal }: B2BCTAProps) {
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.98 }}
         >
-          {t.b2bcta.cta}
+          Create Account
         </motion.button>
       </div>
     </section>

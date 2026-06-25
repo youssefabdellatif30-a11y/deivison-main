@@ -9,7 +9,7 @@ import B2BCTA from "./components/B2BCTA";
 import Footer from "./components/Footer";
 import ProductPage from "./components/ProductPage";
 import AdminPanel from "./admin/AdminPanel";
-import QuoteModal from "./components/QuoteModal";
+import AccountModal from "./components/AccountModal";
 import {
   AboutPage,
   ContactPage,
@@ -25,7 +25,7 @@ function normalizePath(path: string) {
 
 function AppInner() {
   const [path, setPath] = useState(() => normalizePath(window.location.pathname));
-  const [quoteOpen, setQuoteOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
   const { t } = useLang();
 
   useEffect(() => {
@@ -49,7 +49,7 @@ function AppInner() {
   }, [path]);
 
   const pageProps = {
-    onOpenQuote: () => setQuoteOpen(true),
+    onOpenQuote: () => setAccountOpen(true),
     onNavigate: navigate,
   };
 
@@ -60,7 +60,7 @@ function AppInner() {
           productId={productSlug}
           onBack={() => navigate("/collections")}
           isB2B={false}
-          onOpenModal={() => setQuoteOpen(true)}
+          onOpenModal={() => setAccountOpen(true)}
         />
       );
     }
@@ -68,15 +68,15 @@ function AppInner() {
     if (path === "/") {
       return (
         <>
-          <Hero onNavigate={(page) => navigate(page === "collections" ? "/collections" : "/")} onOpenModal={() => setQuoteOpen(true)} />
+          <Hero onNavigate={(page) => navigate(page === "collections" ? "/collections" : "/")} onOpenModal={() => setAccountOpen(true)} />
           <About />
           <Collections
-            onOpenModal={() => setQuoteOpen(true)}
-            onOpenQuote={() => setQuoteOpen(true)}
+            onOpenModal={() => setAccountOpen(true)}
+            onOpenQuote={() => setAccountOpen(true)}
             isB2B={false}
             onViewProduct={(id) => navigate(`/products/${encodeURIComponent(id)}`)}
           />
-          <B2BCTA onOpenModal={() => setQuoteOpen(true)} />
+          <B2BCTA onOpenModal={() => setAccountOpen(true)} />
         </>
       );
     }
@@ -96,8 +96,8 @@ function AppInner() {
             </div>
           </div>
           <Collections
-            onOpenModal={() => setQuoteOpen(true)}
-            onOpenQuote={() => setQuoteOpen(true)}
+            onOpenModal={() => setAccountOpen(true)}
+            onOpenQuote={() => setAccountOpen(true)}
             isB2B={false}
             onViewProduct={(id) => navigate(`/products/${encodeURIComponent(id)}`)}
           />
@@ -118,7 +118,7 @@ function AppInner() {
       <span className="sr-only">{t.b2bBar.text}</span>
 
       <Navbar
-        onOpenQuote={() => setQuoteOpen(true)}
+        onOpenQuote={() => setAccountOpen(true)}
         onNavigate={navigate}
       />
 
@@ -126,11 +126,11 @@ function AppInner() {
 
       <Footer
         onNavigate={navigate}
-        onOpenModal={() => setQuoteOpen(true)}
-        onOpenQuote={() => setQuoteOpen(true)}
+        onOpenModal={() => setAccountOpen(true)}
+        onOpenQuote={() => setAccountOpen(true)}
       />
 
-      <QuoteModal open={quoteOpen} onClose={() => setQuoteOpen(false)} />
+      <AccountModal open={accountOpen} onClose={() => setAccountOpen(false)} />
     </>
   );
 }

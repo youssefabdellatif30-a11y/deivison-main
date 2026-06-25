@@ -282,7 +282,7 @@ export default function Collections({ onOpenModal, isB2B, onViewProduct, onOpenQ
           className="btn-ghost-dark"
           onClick={onOpenQuote}
         >
-          Request a Quote <ArrowRight size={14} />
+          Create Account <ArrowRight size={14} />
         </button>
       </div>
 
