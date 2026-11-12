@@ -8,6 +8,7 @@ import {
   saveProduct,
   updateQuoteStatus,
   uploadProductImage,
+  type EyewearType,
   type FrameShape,
   type Product,
   type ProductColor,
@@ -271,7 +272,9 @@ function ProductsManager({
             </div>
             <div className="prod-row-info">
               <div className="prod-row-name">{product.name.en || "(unnamed)"}</div>
-              <div className="prod-row-ref">{product.ref} · {product.active ? "Active" : "Inactive"}</div>
+              <div className="prod-row-ref">
+                {product.ref} · {product.filterTags.includes("sunglasses") ? "Sunglasses" : "Optical"} · {product.filterTags.includes("mens") ? "Men" : "Women"} · {product.active ? "Active" : "Inactive"}
+              </div>
             </div>
             <div className="prod-row-actions">
               <button className="prod-edit-btn" onClick={() => setEditing(makeProductDraft(product))}>Edit</button>
@@ -384,20 +387,37 @@ function ProductForm({
             <input className="af-input" value={product.ref} onChange={(event) => setField("ref", event.target.value)} required />
           </label>
           <label className="af-field">
-            <span className="af-label">Frame Shape</span>
-            <select className="af-input" value={product.shape} onChange={(event) => setField("shape", event.target.value as FrameShape)}>
-              {SHAPES.map((shape) => <option key={shape} value={shape}>{shape}</option>)}
-            </select>
-          </label>
-          <label className="af-field">
-            <span className="af-label">Category</span>
+            <span className="af-label">Eyewear type</span>
             <select
               className="af-input"
               value={product.filterTags.includes("sunglasses") ? "sunglasses" : "optical"}
-              onChange={(event) => setField("filterTags", [event.target.value as "optical" | "sunglasses", "womens"])}
+              onChange={(event) => setProduct((prev) => ({
+                ...prev,
+                filterTags: [event.target.value as EyewearType, prev.filterTags.includes("mens") ? "mens" : "womens"],
+              }))}
             >
               <option value="optical">Optical</option>
               <option value="sunglasses">Sunglasses</option>
+            </select>
+          </label>
+          <label className="af-field">
+            <span className="af-label">Gender</span>
+            <select
+              className="af-input"
+              value={product.filterTags.includes("mens") ? "men" : "women"}
+              onChange={(event) => setProduct((prev) => ({
+                ...prev,
+                filterTags: [prev.filterTags.includes("sunglasses") ? "sunglasses" : "optical", event.target.value === "men" ? "mens" : "womens"],
+              }))}
+            >
+              <option value="women">Women</option>
+              <option value="men">Men</option>
+            </select>
+          </label>
+          <label className="af-field">
+            <span className="af-label">Frame Shape</span>
+            <select className="af-input" value={product.shape} onChange={(event) => setField("shape", event.target.value as FrameShape)}>
+              {SHAPES.map((shape) => <option key={shape} value={shape}>{shape}</option>)}
             </select>
           </label>
           <label className="af-field">

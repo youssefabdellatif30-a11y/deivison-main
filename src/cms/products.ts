@@ -8,6 +8,8 @@ export interface ProductColor {
 }
 
 export type FilterTag = "optical" | "sunglasses" | "womens" | "mens";
+export type EyewearType = "optical" | "sunglasses";
+export type ProductGender = "women" | "men";
 export type FrameShape = "round" | "square" | "wayfarer" | "aviator";
 
 export interface Product {
@@ -67,6 +69,7 @@ interface ProductRow {
   frame_shape: string | null;
   material: string | null;
   category: string;
+  gender?: ProductGender | null;
   colors: ProductColor[] | null;
   sizes: string[] | null;
   main_image_url: string | null;
@@ -122,13 +125,7 @@ function product(
     filterTags: tags,
     badge: null,
     name: { en: name, fr: name, ar: name },
-    category: tags.includes("sunglasses")
-      ? { en: "Sunglasses", fr: "Lunettes solaires", ar: "Sunglasses" }
-      : {
-          en: tags.includes("mens") ? "Men's Optical Frame" : "Women's Optical Frame",
-          fr: tags.includes("mens") ? "Monture optique homme" : "Monture optique femme",
-          ar: tags.includes("mens") ? "Men's Optical Frame" : "Women's Optical Frame",
-        },
+    category: categoryLabel(getEyewearType(tags), getProductGender(tags)),
     description: { en: description, fr: description, ar: description },
   };
 }
@@ -514,27 +511,37 @@ function normalizeShape(shape: string | null): FrameShape {
   return "wayfarer";
 }
 
-function categoryLabel(category: string, product: ProductRow): Record<string, string> {
-  if (category === "sunglasses") {
-    return { en: "Sunglasses", fr: "Lunettes solaires", ar: "Sunglasses" };
-  }
-
-  const isMens = product.slug.includes("jean") || product.reference.includes("-MEN-");
-  return {
-    en: isMens ? "Men's Optical Frame" : "Women's Optical Frame",
-    fr: isMens ? "Monture optique homme" : "Monture optique femme",
-    ar: isMens ? "Men's Optical Frame" : "Women's Optical Frame",
-  };
+function getEyewearType(tags: FilterTag[]): EyewearType {
+  return tags.includes("sunglasses") ? "sunglasses" : "optical";
 }
 
-function tagsFromRow(product: ProductRow): FilterTag[] {
-  const tags: FilterTag[] = product.category === "sunglasses" ? ["sunglasses"] : ["optical"];
-  if (product.slug.includes("jean") || product.reference.includes("-MEN-")) {
-    tags.push("mens");
-  } else {
-    tags.push("womens");
+function getProductGender(tags: FilterTag[]): ProductGender {
+  return tags.includes("mens") ? "men" : "women";
+}
+
+function categoryLabel(type: EyewearType, gender: ProductGender): Record<string, string> {
+  if (type === "sunglasses") {
+    return gender === "men"
+      ? { en: "Men's Sunglasses", fr: "Lunettes solaires homme", ar: "نظارات شمسية للرجال" }
+      : { en: "Women's Sunglasses", fr: "Lunettes solaires femme", ar: "نظارات شمسية للنساء" };
   }
-  return tags;
+
+  return gender === "men"
+    ? { en: "Men's Optical Frame", fr: "Monture optique homme", ar: "إطارات نظارات طبية للرجال" }
+    : { en: "Women's Optical Frame", fr: "Monture optique femme", ar: "إطارات نظارات طبية للنساء" };
+}
+
+// Keep a fallback for older DB rows until the one-time migration is applied.
+function genderFromRow(row: ProductRow): ProductGender {
+  if (row.gender === "men" || row.gender === "women") return row.gender;
+  const knownMensModels = ["jean", "bruce", "bruno", "clark"];
+  const isMens = knownMensModels.includes(row.slug.toLowerCase()) || row.reference.toUpperCase().includes("-MEN-");
+  return isMens ? "men" : "women";
+}
+
+function tagsFromRow(row: ProductRow): FilterTag[] {
+  const type: EyewearType = row.category === "sunglasses" ? "sunglasses" : "optical";
+  return [type, genderFromRow(row) === "men" ? "mens" : "womens"];
 }
 
 function rowToProduct(row: ProductRow): Product {
@@ -569,7 +576,7 @@ function rowToProduct(row: ProductRow): Product {
       fr: row.name_fr || row.name_en,
       ar: row.name_ar || row.name_en,
     },
-    category: categoryLabel(row.category, row),
+    category: categoryLabel(row.category === "sunglasses" ? "sunglasses" : "optical", genderFromRow(row)),
     description: {
       en: row.description_en || "",
       fr: row.description_fr || row.description_en || "",
@@ -584,7 +591,8 @@ function productToPayload(product: Product) {
     .trim()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
-  const category = product.filterTags.includes("sunglasses") ? "sunglasses" : "optical";
+  const category = getEyewearType(product.filterTags);
+  const gender = getProductGender(product.filterTags);
   const images = [
     ...product.colors.flatMap((color) => [color.image, color.sideImage]),
     ...product.images,
@@ -602,6 +610,7 @@ function productToPayload(product: Product) {
     frame_shape: product.shape,
     material: product.material || "Premium acetate",
     category,
+    gender,
     colors: product.colors,
     sizes: product.sizes,
     main_image_url: product.colors.find((color) => color.image)?.image || product.images[0] || null,
@@ -642,7 +651,12 @@ export async function saveProduct(product: Product): Promise<Product> {
     : supabase.from("products").insert(payload).select("*").single();
   const { data, error } = await query;
 
-  if (error) throw error;
+  if (error) {
+    if (/gender/i.test(error.message) && /column|schema cache/i.test(error.message)) {
+      throw new Error("Update your Supabase database first: run supabase/migrations/20261112_add_product_gender.sql in the SQL Editor.");
+    }
+    throw error;
+  }
   return rowToProduct(data as ProductRow);
 }
 
@@ -727,7 +741,7 @@ export function emptyProduct(): Product {
     sizes: ["49 MM"],
     price: "0.00 TND",
     wholesalePrice: "0.00 TND",
-    filterTags: ["optical"],
+    filterTags: ["optical", "womens"],
     badge: null,
     material: "Premium acetate",
     minimumOrderQuantity: 12,
